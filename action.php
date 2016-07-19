@@ -55,7 +55,8 @@ class action_plugin_highlightparent extends DokuWiki_Action_Plugin {
             }
             $baseTitle = p_get_first_heading($baseID);
             $xhtml_renderer = new Doku_Renderer_xhtml();
-            $link = $xhtml_renderer->internallink($baseID, 'back to ' . ($baseTitle ? $baseTitle : $baseID), false, true);
+            $link = $xhtml_renderer->internallink($baseID, ($baseTitle ? $baseTitle : $baseID), false, true);
+            $link = "<span id='plugin__highlightparent'>$link</span>";
             $event->data = $link . $event->data;
         }
     }
