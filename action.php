@@ -11,6 +11,8 @@ if(!defined('DOKU_INC')) die();
 
 class action_plugin_highlightparent extends DokuWiki_Action_Plugin {
 
+    protected $hasBeenRendered = false;
+
     /**
      * Registers a callback function for a given event
      *
@@ -31,34 +33,49 @@ class action_plugin_highlightparent extends DokuWiki_Action_Plugin {
      *                           handler was registered]
      * @return void
      */
-
-    public function handle_tpl_content_display(Doku_Event &$event, $param) {
-        global $ID, $ACT;
-        if ($ACT != 'show') {
+    public function handle_tpl_content_display(Doku_Event $event, $param) {
+        if ($this->hasBeenRendered) {
             return;
         }
+        $link = $this->tpl();
+        $event->data = $link . $event->data;
+
+    }
+
+    /**
+     * Return a link to the configured parent page
+     *
+     * @return string
+     */
+    public function tpl() {
+        global $ID, $ACT;
+        if (act_clean($ACT) !== 'show') {
+            return '';
+        }
         $pattern = trim($this->getConf('namespace pattern'));
-        if ($pattern == '') {
-            return;
+        if ($pattern === '') {
+            return '';
         }
 
         $matches = array();
 
-        if (preg_match('/' . $pattern . '/', $ID, $matches) == 1) {
+        if (preg_match('/' . $pattern . '/', $ID, $matches) === 1) {
             global $conf;
-            $baseID=$matches[1];
-            if (substr($baseID, -1) == ':') {
+            $baseID = $matches[1];
+            if (substr($baseID, -1) === ':') {
                 $baseID .= $conf['start'];
             }
-            if ($baseID == $ID) {
-                return;
+            if ($baseID === $ID) {
+                return '';
             }
             $baseTitle = p_get_first_heading($baseID);
             $xhtml_renderer = new Doku_Renderer_xhtml();
-            $link = $xhtml_renderer->internallink($baseID, ($baseTitle ? $baseTitle : $baseID), false, true);
+            $link = $xhtml_renderer->internallink($baseID, ($baseTitle ?: $baseID), false, true);
             $link = "<span id='plugin__highlightparent'>$link</span>";
-            $event->data = $link . $event->data;
+            $this->hasBeenRendered = true;
+            return $link;
         }
+        return '';
     }
 
 }
