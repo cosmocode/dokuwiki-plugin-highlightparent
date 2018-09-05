@@ -52,16 +52,27 @@ class action_plugin_highlightparent extends DokuWiki_Action_Plugin {
         if (act_clean($ACT) !== 'show') {
             return '';
         }
-        $pattern = trim($this->getConf('namespace pattern'));
-        if ($pattern === '') {
-            return '';
-        }
 
-        $baseID = $this->getParentIDFromPattern($pattern);
+        $baseID = $this->getBaseID();
         if ($baseID === '') {
             return '';
         }
         return $this->buildLinkToPage($baseID);
+    }
+
+    /**
+     * Determine the page to which to link
+     *
+     * @return string pageid or empty string
+     */
+    protected function getBaseID()
+    {
+        $pattern = trim($this->getConf('namespace pattern'));
+        if ($pattern === '') {
+            return $this->getStartpageOrParentStartpage();
+        }
+
+        return $this->getParentIDFromPattern($pattern);
     }
 
     /**
@@ -88,6 +99,31 @@ class action_plugin_highlightparent extends DokuWiki_Action_Plugin {
             return $baseID;
         }
         return '';
+    }
+
+    /**
+     * Get the startpage of the current namespace or of the parent namespace if on a startpage
+     *
+     * @return string pageid or empty string if on startpage in root namespace
+     */
+    protected function getStartpageOrParentStartpage()
+    {
+        global $ID, $conf;
+        if ($ID === $conf['start']) {
+            return '';
+        }
+        $ns = getNS($ID);
+        $page = noNS($ID);
+
+        if ($ns === false) {
+            return ':' . $conf['start'];
+        }
+
+        if ($page !== $conf['start']) {
+            return $ns . ':' . $conf['start'];
+        }
+
+        return getNS($ns) . ':' . $conf['start'];
     }
 
     /**
