@@ -57,6 +57,23 @@ class action_plugin_highlightparent extends DokuWiki_Action_Plugin {
             return '';
         }
 
+        $baseID = $this->getParentIDFromPattern($pattern);
+        if ($baseID === '') {
+            return '';
+        }
+        return $this->buildLinkToPage($baseID);
+    }
+
+    /**
+     * Determine if and to which page to link based on the configured pattern
+     *
+     * @param string $pattern regex to match a namespace
+     *
+     * @return string pageid or empty string
+     */
+    protected function getParentIDFromPattern($pattern)
+    {
+        global $ID;
         $matches = array();
 
         if (preg_match('/' . $pattern . '/', $ID, $matches) === 1) {
@@ -68,7 +85,7 @@ class action_plugin_highlightparent extends DokuWiki_Action_Plugin {
             if ($baseID === $ID) {
                 return '';
             }
-            return $this->buildLinkToPage($baseID);
+            return $baseID;
         }
         return '';
     }
