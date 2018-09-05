@@ -6,8 +6,5 @@
  */
 
 // keys need to match the config setting name
-// $lang['fixme'] = 'FIXME';
+$lang['namespace pattern'] = 'Pattern to define the parent namespace to highlight. Leave empty to link to the startpage of the current or parent namespace.';
 
-
-
-//Setup VIM: ex: et ts=4 :
