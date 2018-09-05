@@ -68,16 +68,27 @@ class action_plugin_highlightparent extends DokuWiki_Action_Plugin {
             if ($baseID === $ID) {
                 return '';
             }
-            $baseTitle = p_get_first_heading($baseID);
-            $xhtml_renderer = new Doku_Renderer_xhtml();
-            $link = $xhtml_renderer->internallink($baseID, ($baseTitle ?: $baseID), false, true);
-            $link = "<span id='plugin__highlightparent'>$link</span>";
-            $this->hasBeenRendered = true;
-            return $link;
+            return $this->buildLinkToPage($baseID);
         }
         return '';
     }
 
+    /**
+     * Render a link to a wikipage as HTML, wrapped by a span with an id
+     *
+     * @param string $baseID
+     *
+     * @return string
+     */
+    protected function buildLinkToPage($baseID)
+    {
+        $baseTitle = p_get_first_heading($baseID);
+        $xhtml_renderer = new Doku_Renderer_xhtml();
+        $link = $xhtml_renderer->internallink($baseID, ($baseTitle ?: $baseID), false, true);
+        $link = "<span id='plugin__highlightparent'>$link</span>";
+        $this->hasBeenRendered = true;
+        return $link;
+    }
 }
 
 // vim:ts=4:sw=4:et:
